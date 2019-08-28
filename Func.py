@@ -44,7 +44,7 @@ def select_match(browser, times):
     for x in List_match:
         try:
             # Выбор матчей со временем игры меньше 15 минут
-            if int(str(x.text).strip().split("\n")[0]) < 15:
+            if int(str(x.text).strip().split("\n")[0]) < 30:
                 List_need_match.append(str(x.text).strip().split("\n")[1])
         except ValueError:
             pass
@@ -73,22 +73,22 @@ def open_match(List_need_match, browser):
     # Получаем список всех матчей
     List_match_online = browser.find_elements_by_class_name('event__participant--home')
     # Ищем нужный нам матч и открываем его
-    for z in List_match_online:
-        print(z.text)
-    for x in List_need_match:
-        for y in List_match_online:
-            if x == y.text:
-                while True:
-                    try:
-                        y.click()
-                        number_of_matches(browser)
-                    except selenium.common.exceptions.ElementClickInterceptedException:
-                        browser.execute_script("window.scrollTo(0," + str(int(x.location.get("y")) + 100) + ")")
-                    else:
-                        break
-            else:
-                pass
-
+    try:
+        for x in List_need_match:
+            for y in List_match_online:
+                if x == y.text:
+                    while True:
+                        try:
+                            y.click()
+                            number_of_matches(browser)
+                        except selenium.common.exceptions.ElementClickInterceptedException:
+                            browser.execute_script("window.scrollTo(0," + str(int(x.location.get("y")) + 100) + ")")
+                        else:
+                            break
+                else:
+                    pass
+    except IndexError:
+        pass
 
 
 def number_of_matches(browser):
