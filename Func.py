@@ -1,4 +1,7 @@
 import selenium
+import time
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.support.wait import WebDriverWait
@@ -24,12 +27,12 @@ def open_tabs(browser):
         browser.find_element_by_xpath('//*[@id="live-table"]/div[1]/ul/li[6]/a/div').click()
 
     List_scroll = browser.find_elements_by_css_selector(".event__expander.icon--expander.expand")
+    # Удаляем рекламу, чтоб она не мешала открывать вкладки
+    browser.execute_script('''var app = document.querySelector(".sticky-wrapper");
+                              app.removeChild(app.firstChild)''')
     for x in List_scroll:
-        try:
-            List_scroll[z].click()
-            z -= 1
-        except selenium.common.exceptions.ElementClickInterceptedException:
-            browser.execute_script("window.scrollTo(0," + str(int(x.location.get("y")) - 100) + ")")
+        List_scroll[z].click()
+        z -= 1
     browser.execute_script("window.scrollTo(0, 0)")
 
 
@@ -59,32 +62,33 @@ def select_match(browser, times):
             List_need_match.remove(x)
     return List_need_match
 
+def select_match_schedule(browser):
+    List_need_match = []
+    List_match = browser.find_elements_by_class_name("event__match")
+    for x in List_match:
+        List_need_match.append(str(x.text).strip().split("\n")[1])
+    return List_need_match
 
 def open_match(List_need_match, browser):
     # Получаем список всех матчей
     List_match_online = browser.find_elements_by_class_name('event__participant--home')
-    while True:
-        try:
-            # Ищем нужный нам матч и открываем его
-            for x in List_need_match:
-                for y in List_match_online:
-                    if x == y.text:
-                        while True:
-                            try:
-                                y.click()
-                                number_of_matches(browser)
-                            except selenium.common.exceptions.ElementClickInterceptedException:
-                                browser.execute_script("window.scrollTo(0," + str(int(x.location.get("y")) + 100) + ")")
-                            else:
-                                break
+    # Ищем нужный нам матч и открываем его
+    for z in List_match_online:
+        print(z.text)
+    for x in List_need_match:
+        for y in List_match_online:
+            if x == y.text:
+                while True:
+                    try:
+                        y.click()
+                        number_of_matches(browser)
+                    except selenium.common.exceptions.ElementClickInterceptedException:
+                        browser.execute_script("window.scrollTo(0," + str(int(x.location.get("y")) + 100) + ")")
                     else:
-                        pass
-        except selenium.common.exceptions.StaleElementReferenceException:
-            print("Ошибочка ((")
-            browser.close()
-            browser.switch_to.window(browser.window_handles[-1])
-        else:
-            break
+                        break
+            else:
+                pass
+
 
 
 def number_of_matches(browser):

@@ -5,12 +5,11 @@ url = "https://www.myscore.ru/"
 Library.browser.get(url)
 
 # Написать "LIVE" для парсинга лайв матчей. По умолчанию пасинг происходит по "Расписание"
-Library.Select = "LIVE"
-
+Library.Select = ""
 for times in range(100):
     Func.open_tabs(Library.browser)
     if Library.Select == "LIVE":
         Func.open_match(Func.select_match(Library.browser, times), Library.browser)
     else:
-        pass
+        Func.open_match(Func.select_match_schedule(Library.browser), Library.browser)
     time.sleep(300)
